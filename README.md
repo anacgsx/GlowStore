@@ -1,4 +1,4 @@
-# GlowStore — E-commerce de Beleza com Design Patterns
+# GlowStore — E-commerce de Beleza com Padrões de Projeto
 
 GlowStore é uma aplicação web em Django que simula um marketplace de beleza. A proposta é reunir lojas e marcas de maquiagem, skincare, cabelo, perfume e cuidados pessoais em uma experiência de compra clean, feminina e sofisticada.
 
