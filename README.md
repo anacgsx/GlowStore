@@ -139,3 +139,8 @@ Admin:
 ```text
 http://127.0.0.1:8000/admin
 ```
+## Preview da Página Inicial
+
+<p align="center">
+  <img src="README/home.png" width="900">
+</p>
