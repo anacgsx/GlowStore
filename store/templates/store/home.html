@@ -1,0 +1,77 @@
+{% extends 'store/base.html' %}
+{% block title %}GlowStore | Beleza em uma só vitrine{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <span>GlowStore</span>
+    <h1>Beleza que acompanha sua rotina.</h1>
+    <p>Produtos de make, skincare, cabelo e perfume reunidos em vitrines de marcas independentes e queridinhas.</p>
+    <a class="btn" href="#trending">Shop glow picks</a>
+  </div>
+  <div class="hero-visual">
+    <img src="/static/images/hero/pink_make.png" alt="Hero Image">
+  </div>
+</section>
+
+<section id="categories" class="brand-row">
+  <a class="btn" href="#make">MAKE</a>
+  <a class="btn" href="#skincare">SKINCARE</a>
+  <a class="btn" href="#hair">HAIR</a>
+  <a class="btn" href="#perfume">PERFUME</a>
+  <a class="btn" href="#body">BODY</a>
+</section>
+
+<section id="stores" class="section-head">
+  <div>
+    <h2>marcas & lojas</h2>
+  </div>
+</section>
+<div class="store-grid">
+  {% for store in stores %}
+  <article class="store-card">
+    <div class="store-logo">
+     {% if store.logo %}
+     <img src="{{ store.logo.url }}">
+     {% else %}
+     <img src="/static/images/default-store.png">
+     {% endif %}
+  </div>
+    <h3>{{ store.name }}</h3>
+    <p>{{ store.slogan }}</p>
+    <div class="card-actions">
+      <a class="mini-btn" href="{% url 'store_detail' store.slug %}">ver vitrine</a>
+      {% if user.is_authenticated %}<a class="heart" href="{% url 'toggle_favorite_store' store.id %}">♡</a>{% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+
+<section id="trending" class="section-head">
+  <div>
+    <h2>produtos mais procurados</h2>
+  </div>
+  <a class="outline-btn" href="#">shop all</a>
+</section>
+<div class="product-grid">
+  {% for product in products %}
+  <article class="product-card">
+    {% if product.has_discount %}<span class="tag">-{{ product.discount_percent }}%</span>{% endif %}
+    <a href="{% url 'product_detail' product.slug %}" class="product-art">
+      {% if product.image %}
+      <img src="{{ product.image.url }}">
+      {% else %}
+      <img src="/static/images/default-product.png">
+      {% endif %}
+    </a>
+    <div class="product-info">
+      <small>{{ product.store.name }}</small>
+      <h3>{{ product.name }}</h3>
+      <p>{{ product.description|truncatechars:70 }}</p>
+      <strong>R$ {{ product.price }}</strong>
+    </div>
+    <form method="post" action="{% url 'add_to_cart' product.id %}">{% csrf_token %}<button
+        class="cart-btn">adicionar</button></form>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

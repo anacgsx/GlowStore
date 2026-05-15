@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GlowStore{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@0,600;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'store/css/styles.css' %}">
+  <link rel="shortcut icon" href="/static/images/default-store.png" type="image/x-icon">
+</head>
+<body>
+  <div class="topbar">frete grátis em compras acima de R$180 • glow club com 10% off</div>
+  <header class="navbar">
+    <nav class="nav-left">
+      <a href="{% url 'home' %}">Shop</a>
+      <a href="#stores">Lojas</a>
+      <a href="#categories">Categorias</a>
+    </nav>
+    <a class="logo" href="{% url 'home' %}">GlowStore</a>
+    <nav class="nav-right">
+      {% if user.is_authenticated %}
+        <a href="{% url 'favorites' %}">Favs</a>
+        <a href="{% url 'profile' %}">Perfil</a>
+        <a href="{% url 'logout' %}">Sair</a>
+      {% else %}
+        <a href="{% url 'login' %}">Login</a>
+      {% endif %}
+      <a href="{% url 'cart' %}" class="bag">Carrinho <span>{{ cart_count }}</span></a>
+    </nav>
+  </header>
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+    </div>
+  {% endif %}
+  <main>{% block content %}{% endblock %}</main>
+  <footer class="footer">
+    <div>
+      <h2>GlowStore</h2>
+      <p>Um marketplace de beleza clean, feminino e sofisticado, juntando vitrines de marcas em uma experiência única.</p>
+    </div>
+    <div>
+      <h4>Comprar</h4>
+      <a href="{% url 'home' %}">Produtos</a>
+      <a href="{% url 'favorites' %}">Favoritos</a>
+      <a href="{% url 'cart' %}">Carrinho</a>
+    </div>
+    <div>
+      <h4>Conta</h4>
+      <a href="{% url 'profile' %}">Perfil</a>
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}">Cadastro</a>
+    </div>
+    <div>
+      <h4>Newsletter</h4>
+      <form class="newsletter"><input placeholder="seu melhor e-mail"><button type="button">Assinar</button></form>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ beauty_store.name }} | GlowStore{% endblock %}
+{% block content %}
+<section class="store-hero">
+  <div>
+    <h1>{{ beauty_store.name }}</h1>
+    <p>{{ beauty_store.description }}</p>
+    {% if user.is_authenticated %}<a class="btn" href="{% url 'toggle_favorite_store' beauty_store.id %}">favoritar loja ♡</a>{% endif %}
+  </div>
+  <div class="big-logo">
+  {% if beauty_store.logo %}
+    <img src="{{ beauty_store.logo.url }}">
+  {% else %}
+    <img src="/static/images/default-store.png">
+  {% endif %}
+  </div>
+</section>
+<div class="chips">
+  <a class="chip {% if not active %}active{% endif %}" href="{% url 'store_detail' beauty_store.slug %}">todos</a>
+  {% for category in categories %}
+    <a class="chip {% if active == category.slug %}active{% endif %}" href="?categoria={{ category.slug }}">{{ category.name }}</a>
+  {% endfor %}
+</div>
+<div class="product-grid">
+  {% for product in products %}
+    <article class="product-card">
+      <a href="{% url 'product_detail' product.slug %}" class="product-art">
+      {% if product.image %}
+        <img src="{{ product.image.url }}">
+      {% else %}
+        <img src="/static/images/default-product.png">
+      {% endif %}
+    </a>
+      <div class="product-info">
+        <small>{{ product.category.name }}</small>
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.description|truncatechars:75 }}</p>
+        <strong>R$ {{ product.price }}</strong>
+      </div>
+      <div class="inline-actions">
+        <form method="post" action="{% url 'add_to_cart' product.id %}">{% csrf_token %}<button class="cart-btn">add</button></form>
+        {% if user.is_authenticated %}<a class="heart" href="{% url 'toggle_favorite_product' product.id %}">♡</a>{% endif %}
+      </div>
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}

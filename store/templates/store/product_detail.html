@@ -1,0 +1,48 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ product.name }} | GlowStore{% endblock %}
+{% block content %}
+<section class="product-page">
+  <div class="main-product-art">
+    {% if product.image %}
+    <img src="{{ product.image.url }}">
+    {% else %}
+    <img src="/static/images/default-product.png">
+    {% endif %}
+  </div>
+  <div class="product-copy">
+    <small>{{ product.store.name }} / {{ product.category.name }}</small>
+    <h1>{{ product.name }}</h1>
+    <p class="swatch">{{ product.color_name|default:'tom universal' }} <span></span><span></span><span></span></p>
+    <h2>R$ {{ product.price }}</h2>
+    <p>{{ product.description }}</p>
+    <form method="post" action="{% url 'add_to_cart' product.id %}" class="buy-form">
+      {% csrf_token %}
+      <input type="number" name="quantity" min="1" value="1">
+      <button class="btn">Adicionar ao carrinho</button>
+      {% if user.is_authenticated %}<a class="heart big" href="{% url 'toggle_favorite_product' product.id %}">♡</a>{% endif %}
+    </form>
+    <details open><summary>Especificação</summary><p>Produto original vendido pela loja {{ product.store.name }}. Estoque atual: {{ product.stock }} unidades.</p></details>
+    <details><summary>Entrega</summary><p>Entrega padrão grátis acima de R$180 ou expressa com taxa fixa.</p></details>
+  </div>
+</section>
+<section class="section-head"><div><span>complete o glow</span><h2>Combinações perfeitas</h2></div></section>
+<div class="product-grid compact">
+  {% for item in related %}
+    <article class="product-card">
+      <a class="product-art" href="{% url 'product_detail' item.slug %}">
+        {% if item.image %}
+        <img src="{{ item.image.url }}">
+        {% else %}
+        <img src="/static/images/default-product.png">
+        {% endif %}
+      </a>
+      <div class="product-info">
+      <h3>{{ item.name }}</h3>
+      <strong>R$ {{ item.price }}</strong>
+    </div>
+    <form method="post" action="{% url 'add_to_cart' item.id %}">{% csrf_token %}<button
+      class="cart-btn">adicionar</button></form>
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}

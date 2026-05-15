@@ -1,0 +1,6 @@
+{% extends 'store/base.html' %}
+{% block title %}Perfil | GlowStore{% endblock %}
+{% block content %}
+<section class="page-title"><h1>Perfil de {{ user.username }}</h1></section>
+<div class="order-card"><h2>Histórico de pedidos</h2>{% for order in orders %}<p><a href="{% url 'order_detail' order.id %}">Pedido #{{ order.id }}</a> • {{ order.get_status_display }} • R$ {{ order.total }}</p>{% empty %}<p>Você ainda não fez pedidos.</p>{% endfor %}</div>
+{% endblock %}
