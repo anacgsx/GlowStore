@@ -1,13 +1,3 @@
-"""Padrões de Projeto utilizados:
-
-1. Singleton: CartSession mantém uma única instância por request.
-2. Factory: PaymentStrategyFactory cria a estratégia correta de pagamento.
-3. Strategy: ShippingStrategy e PaymentStrategy permitem trocar regras sem mexer no checkout.
-4. Builder: OrderBuilder monta um pedido passo a passo antes de salvar.
-5. Facade: CheckoutFacade simplifica o processo inteiro de finalização.
-6. Observer: OrderSubject notifica interessados quando um pedido é criado.
-7. Command: CartCommand/FavoriteCommand encapsulam ações de interface.
-"""
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -189,7 +179,7 @@ class OrderBuilder:
         return OrderDraft(**self.data)
 
 
-# 6) OBSERVER
+# 5) OBSERVER
 class OrderObserver(ABC):
     @abstractmethod
     def update(self, order: Order):
@@ -222,7 +212,7 @@ class OrderSubject:
             observer.update(order)
 
 
-# 5) FACADE
+# 6) FACADE
 class CheckoutFacade:
     def __init__(self, request):
         self.request = request
