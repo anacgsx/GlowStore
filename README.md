@@ -77,7 +77,7 @@ Clonar o Repositório:
 
 ```bash
 git clone https://github.com/anacgsx/GlowStore.git
-cd glowstore
+cd GlowStore
 ```
 
 Criar ambiente virtual:
