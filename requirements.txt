@@ -1,2 +1,5 @@
 Django==5.0.6
 Pillow>=11.0.0
+gunicorn>=22.0.0
+whitenoise>=6.7.0
+behave==1.2.6

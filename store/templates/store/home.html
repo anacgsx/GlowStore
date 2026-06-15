@@ -1,76 +1,82 @@
 {% extends 'store/base.html' %}
 {% block title %}GlowStore | Beleza em uma só vitrine{% endblock %}
 {% block content %}
-<section class="hero">
-  <div class="hero-copy">
-    <span>GlowStore</span>
-    <h1>Beleza que acompanha sua rotina.</h1>
-    <p>Produtos de make, skincare, cabelo e perfume reunidos em vitrines de marcas independentes e queridinhas.</p>
-    <a class="btn" href="#trending">Shop glow picks</a>
-  </div>
-  <div class="hero-visual">
-    <img src="/static/images/hero/pink_make.png" alt="Hero Image">
-  </div>
+<section class="hero-carousel" aria-label="Destaques GlowStore">
+  <article class="hero-slide active">
+    <div class="hero-copy">
+      <span>GlowStore</span>
+      <h1>Beleza que acompanha sua rotina.</h1>
+      <p>Produtos de make, skincare, cabelo e perfume reunidos em vitrines de marcas queridinhas.</p>
+      <a class="btn" href="{% url 'categories' %}">Shop best sellers</a>
+    </div>
+    <div class="hero-visual"><img src="/static/images/hero/pink_make.png" alt=""></div>
+  </article>
+  <article class="hero-slide">
+    <div class="hero-copy">
+      <span>GlowClub</span>
+      <h1>Compre, pontue, brilhe!</h1>
+      <p>A cada R$1 gasto você ganha 1 ponto para trocar por descontos e recompensas.</p>
+      <a class="btn" href="{% url 'profile' %}">Ver meu clube</a>
+    </div>
+    <div class="hero-visual"><img src="/static/images/hero/hero-points.png" alt=""></div>
+  </article>
+  <article class="hero-slide">
+    <div class="hero-copy">
+      <span>Novas Vitrines</span>
+      <h1>Marcas de beleza em um só lugar.</h1>
+      <p>Explore lojas, categorias e produtos em uma experiência premium.</p>
+      <a class="btn" href="{% url 'stores' %}">Explorar lojas</a>
+    </div>
+    <div class="hero-visual"><img src="/static/images/hero/rhode_products.png" alt=""></div>
+  </article>
+  <div class="hero-dots" aria-hidden="true"><span class="active"></span><span></span><span></span></div>
 </section>
 
-<section id="categories" class="brand-row">
-  <a class="btn" href="#make">MAKE</a>
-  <a class="btn" href="#skincare">SKINCARE</a>
-  <a class="btn" href="#hair">HAIR</a>
-  <a class="btn" href="#perfume">PERFUME</a>
-  <a class="btn" href="#body">BODY</a>
+<section class="brand-row" id="categories">
+  {% for category in categories %}
+    <a class="category-pill" href="{% url 'categories' %}?categoria={{ category.slug }}">{{ category.name }}</a>
+  {% endfor %}
 </section>
 
 <section id="stores" class="section-head">
-  <div>
-    <h2>marcas & lojas</h2>
-  </div>
+  <div><h2>Marcas & Lojas</h2></div>
+  <a class="outline-btn" href="{% url 'stores' %}">Ver todas</a>
 </section>
 <div class="store-grid">
-  {% for store in stores %}
+  {% for store in stores|slice:':4' %}
   <article class="store-card">
     <div class="store-logo">
-     {% if store.logo %}
-     <img src="{{ store.logo.url }}">
-     {% else %}
-     <img src="/static/images/default-store.png">
-     {% endif %}
-  </div>
+      {% if store.logo %}<img src="{{ store.logo.url }}" alt="{{ store.name }}">{% else %}<img src="/static/images/default-store.png" alt="{{ store.name }}">{% endif %}
+    </div>
     <h3>{{ store.name }}</h3>
     <p>{{ store.slogan }}</p>
     <div class="card-actions">
-      <a class="mini-btn" href="{% url 'store_detail' store.slug %}">ver vitrine</a>
-      {% if user.is_authenticated %}<a class="heart" href="{% url 'toggle_favorite_store' store.id %}">♡</a>{% endif %}
+      <a class="mini-btn" href="{% url 'store_detail' store.slug %}">Ver vitrine</a>
+      {% if user.is_authenticated %}<a class="heart {% if store.id in favorite_store_ids %}active{% endif %}" href="{% url 'toggle_favorite_store' store.id %}" aria-label="Favoritar loja">♥</a>{% endif %}
     </div>
   </article>
   {% endfor %}
 </div>
 
 <section id="trending" class="section-head">
-  <div>
-    <h2>produtos mais procurados</h2>
-  </div>
-  <a class="outline-btn" href="#">shop all</a>
+  <div><h2>Produtos mais procurados</h2></div>
+  <a class="outline-btn" href="{% url 'categories' %}">Shop all</a>
 </section>
 <div class="product-grid">
   {% for product in products %}
   <article class="product-card">
     {% if product.has_discount %}<span class="tag">-{{ product.discount_percent }}%</span>{% endif %}
+    {% if user.is_authenticated %}<a class="heart floating-heart {% if product.id in favorite_product_ids %}active{% endif %}" href="{% url 'toggle_favorite_product' product.id %}" aria-label="Favoritar produto">♥</a>{% endif %}
     <a href="{% url 'product_detail' product.slug %}" class="product-art">
-      {% if product.image %}
-      <img src="{{ product.image.url }}">
-      {% else %}
-      <img src="/static/images/default-product.png">
-      {% endif %}
+      {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}<img src="/static/images/default-product.png" alt="{{ product.name }}">{% endif %}
     </a>
     <div class="product-info">
       <small>{{ product.store.name }}</small>
       <h3>{{ product.name }}</h3>
-      <p>{{ product.description|truncatechars:70 }}</p>
+      <p>{{ product.description|truncatechars:78 }}</p>
       <strong>R$ {{ product.price }}</strong>
     </div>
-    <form method="post" action="{% url 'add_to_cart' product.id %}">{% csrf_token %}<button
-        class="cart-btn">adicionar</button></form>
+    <form method="post" action="{% url 'add_to_cart' product.id %}">{% csrf_token %}<button class="cart-btn">Adicionar ao carrinho</button></form>
   </article>
   {% endfor %}
 </div>

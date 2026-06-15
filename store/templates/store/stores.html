@@ -1,0 +1,20 @@
+{% extends 'store/base.html' %}
+{% block title %}Lojas | GlowStore{% endblock %}
+{% block content %}
+<section class="page-title"><span>vitrines oficiais</span><h1>Lojas GlowStore</h1><p>Explore marcas de beleza em vitrines próprias.</p></section>
+<div class="store-grid large">
+  {% for store in stores %}
+  <article class="store-card featured-card">
+    <div class="store-logo">
+      {% if store.logo %}<img src="{{ store.logo.url }}" alt="{{ store.name }}">{% else %}<img src="/static/images/default-store.png" alt="{{ store.name }}">{% endif %}
+    </div>
+    <h3>{{ store.name }}</h3>
+    <p>{{ store.description|truncatechars:120 }}</p>
+    <div class="card-actions">
+      <a class="mini-btn" href="{% url 'store_detail' store.slug %}">Ver Loja</a>
+      {% if user.is_authenticated %}<a class="heart {% if store.id in favorite_store_ids %}active{% endif %}" href="{% url 'toggle_favorite_store' store.id %}">♥</a>{% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'store/base.html' %}
+{% block title %}Busca | GlowStore{% endblock %}
+{% block content %}
+<section class="page-title"><span>resultado da busca</span><h1>Busca por “{{ query }}”</h1></section>
+{% if query %}
+  {% if stores %}<h2 class="subheading">Lojas</h2><div class="store-grid compact-grid">{% for store in stores %}<article class="store-card"><div class="store-logo">{% if store.logo %}<img src="{{ store.logo.url }}" alt="{{ store.name }}">{% else %}<img src="/static/images/default-store.png">{% endif %}</div><h3>{{ store.name }}</h3><p>{{ store.slogan }}</p><a class="mini-btn" href="{% url 'store_detail' store.slug %}">ver vitrine</a></article>{% endfor %}</div>{% endif %}
+  <h2 class="subheading">Produtos</h2>
+  <div class="product-grid">
+    {% for product in products %}
+    <article class="product-card"><a href="{% url 'product_detail' product.slug %}" class="product-art">{% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}<img src="/static/images/default-product.png">{% endif %}</a><div class="product-info"><small>{{ product.store.name }}</small><h3>{{ product.name }}</h3><p>{{ product.description|truncatechars:75 }}</p><strong>R$ {{ product.price }}</strong></div><form method="post" action="{% url 'add_to_cart' product.id %}">{% csrf_token %}<button class="cart-btn">adicionar</button></form></article>
+    {% empty %}<p class="empty-line">Nenhum produto encontrado para essa busca.</p>{% endfor %}
+  </div>
+{% else %}
+  <div class="empty"><h2>Digite algo para buscar.</h2></div>
+{% endif %}
+{% endblock %}

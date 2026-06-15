@@ -1,35 +1,19 @@
 {% extends 'store/base.html' %}
 {% block title %}Favoritos | GlowStore{% endblock %}
 {% block content %}
-<section class="page-title"><span>seus queridinhos</span><h1>Favoritos</h1></section>
+<section class="page-title"><h1>Favoritos</h1></section>
 <h2 class="subheading">Lojas favoritas</h2>
 <div class="store-grid">
-  {% for fav in store_favorites %}<article class="store-card">
-    <div class="store-logo">
-      {% if fav.store.logo %}
-      <img src="{{ fav.store.logo.url }}" alt="{{ fav.store.name }}">
-      {% else %}
-      <img src="/static/images/default-store.png">
-      {% endif %}
-    </div>
-    <h3>{{ fav.store.name }}</h3><p>{{ fav.store.slogan }}</p><a class="mini-btn" href="{% url 'store_detail' fav.store.slug %}">ver vitrine</a></article>{% empty %}<p>Nenhuma loja favoritada ainda.</p>{% endfor %}
+  {% for fav in store_favorites %}<article class="store-card"><div class="store-logo">{% if fav.store.logo %}<img src="{{ fav.store.logo.url }}" alt="{{ fav.store.name }}">{% else %}<img src="/static/images/default-store.png" alt="{{ fav.store.name }}">{% endif %}</div><h3>{{ fav.store.name }}</h3><p>{{ fav.store.slogan }}</p><a class="mini-btn" href="{% url 'store_detail' fav.store.slug %}">ver vitrine</a></article>{% empty %}<p class="empty-line">Nenhuma loja favoritada ainda.</p>{% endfor %}
 </div>
 <h2 class="subheading">Produtos favoritos</h2>
 <div class="product-grid">
   {% for fav in product_favorites %}
   <article class="product-card">
-    <a class="product-art" href="{% url 'product_detail' fav.product.slug %}">
-      {% if fav.product.image %}
-      <img src="{{ fav.product.image.url }}">
-      {% else %}
-      <img src="/static/images/default-product.png">
-      {% endif %}
-    </a>
-    <div class="product-info"><h3>{{ fav.product.name }}</h3>
-    <p>{{ fav.product.store.name }}</p>
-    <strong>R$ {{ fav.product.price }}</strong>
-  </div>
+    <a class="product-art" href="{% url 'product_detail' fav.product.slug %}">{% if fav.product.image %}<img src="{{ fav.product.image.url }}" alt="{{ fav.product.name }}">{% else %}<img src="/static/images/default-product.png" alt="{{ fav.product.name }}">{% endif %}</a>
+    <div class="product-info"><small>{{ fav.product.store.name }}</small><h3>{{ fav.product.name }}</h3><strong>R$ {{ fav.product.price }}</strong></div>
+    <form method="post" action="{% url 'add_to_cart' fav.product.id %}">{% csrf_token %}<button class="cart-btn">adicionar</button></form>
   </article>
-  {% empty %}<p>Nenhum produto favoritado ainda.</p>{% endfor %}
+  {% empty %}<p class="empty-line">Nenhum produto favoritado ainda.</p>{% endfor %}
 </div>
 {% endblock %}

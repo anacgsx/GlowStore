@@ -1,6 +1,40 @@
 {% extends 'store/base.html' %}
 {% block title %}Perfil | GlowStore{% endblock %}
 {% block content %}
-<section class="page-title"><h1>Perfil de {{ user.username }}</h1></section>
-<div class="order-card"><h2>Histórico de pedidos</h2>{% for order in orders %}<p><a href="{% url 'order_detail' order.id %}">Pedido #{{ order.id }}</a> • {{ order.get_status_display }} • R$ {{ order.total }}</p>{% empty %}<p>Você ainda não fez pedidos.</p>{% endfor %}</div>
+<section class="profile-hero">
+  <div><span>Minha conta</span>
+  <h1>Olá, {{ user.first_name|default:user.username }}</h1>
+  <p>Gerencie pedidos, pontos e benefícios GlowClub.</p>
+</div>
+<div class="points-card">
+  <small>GlowClub {{ account.tier }}</small>
+  <strong>{{ account.points }}</strong><span>pontos disponíveis</span>
+</div>
+</section>
+
+<div class="profile-layout">
+  <aside class="profile-menu">
+    <a href="#orders">Meus pedidos</a>
+    <a href="#glowclub">GlowClub</a>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">LogOut</button></form>
+  </aside>
+
+  <section class="profile-content">
+    <div class="order-card" id="orders"><h2>Meus pedidos</h2>{% for order in orders %}<p><a href="{% url 'order_detail' order.id %}">Pedido #{{ order.id }}</a> • {{ order.get_status_display }} • R$ {{ order.total }} • +{{ order.glow_points_earned }} pontos</p>{% empty %}<p>Você ainda não fez pedidos.</p>{% endfor %}</div>
+
+    <div class="order-card" id="glowclub">
+      <h2>GlowClub</h2>
+      <p>A cada R$1 gasto, você ganha 1 ponto. Depois, pode trocar por descontos e recompensas.</p>
+      <div class="reward-grid">
+        {% for reward in rewards %}
+        <article class="reward-card"><h3>{{ reward.title }}</h3><p>{{ reward.description }}</p><strong>{{ reward.points_required }} pontos</strong><form method="post" action="{% url 'redeem_reward' reward.id %}">{% csrf_token %}<button class="mini-btn" {% if account.points < reward.points_required %}disabled{% endif %}>resgatar</button></form></article>
+        {% endfor %}
+      </div>
+      <h3>Meus resgates</h3>
+      <div class="redemption-list">
+        {% for redemption in redemptions %}<p><strong>{{ redemption.code }}</strong> • {{ redemption.reward.title }} • {{ redemption.get_status_display }}</p>{% empty %}<p>Nenhum resgate ainda.</p>{% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
 {% endblock %}

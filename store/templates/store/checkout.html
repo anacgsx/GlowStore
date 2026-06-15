@@ -1,9 +1,9 @@
 {% extends 'store/base.html' %}
 {% block title %}Checkout | GlowStore{% endblock %}
 {% block content %}
-<section class="page-title"><h1>Finalização de compra</h1></section>
+<section class="page-title"><span>último passo</span><h1>Finalização de compra</h1></section>
 <div class="checkout-layout">
-  <form method="post" class="panel-form">
+  <form method="post" class="panel-form checkout-form" id="checkout-form">
     {% csrf_token %}
     <h2>Entrega</h2>
     {{ form.full_name.label_tag }} {{ form.full_name }}
@@ -12,16 +12,22 @@
     {{ form.payment_method.label_tag }} {{ form.payment_method }}
     <h2>Envio</h2>
     {{ form.shipping_method.label_tag }} {{ form.shipping_method }}
-    <button class="btn full">confirmar pedido</button>
+    <h2>GlowClub</h2>
+    {{ form.reward_code.label_tag }} {{ form.reward_code }}
+    <small>Use o código de um resgate disponível no seu perfil.</small>
+    <button class="btn full">Confirmar pedido</button>
   </form>
-  <aside class="summary sticky">
+  <aside class="summary sticky checkout-summary">
     <h2>Confirmação</h2>
     {% for item in items %}<p>{{ item.product.name }} <strong>{{ item.quantity }}x</strong></p>{% endfor %}
     <hr>
-    <p>Subtotal <strong>R$ {{ preview.subtotal }}</strong></p>
-    <p>Entrega <strong>R$ {{ preview.shipping_total }}</strong></p>
-    <p>Desconto <strong>- R$ {{ preview.discount_total }}</strong></p>
-    <h3>Total R$ {{ preview.total }}</h3>
+    <p>Subtotal <strong id="checkout-subtotal">R$ {{ preview.subtotal }}</strong></p>
+    <p>Entrega <strong id="checkout-shipping">R$ {{ preview.shipping_total }}</strong></p>
+    <p>Desconto pagamento <strong id="checkout-payment-discount">- R$ {{ preview.payment_discount }}</strong></p>
+    <p>Desconto GlowClub <strong id="checkout-reward-discount">- R$ {{ preview.reward_discount }}</strong></p>
+    <h3>Total <span id="checkout-total">R$ {{ preview.total }}</span></h3>
+    <small>Você ganhará aproximadamente <strong id="checkout-points">{{ preview.total|floatformat:0 }}</strong> pontos GlowClub.</small>
   </aside>
 </div>
+{{ checkout_config|json_script:"checkout-config" }}
 {% endblock %}

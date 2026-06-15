@@ -1,13 +1,18 @@
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from servico_GlowClub import GlowClubService
 from .forms import CheckoutForm, RegisterForm
-from .models import BeautyStore, Category, FavoriteProduct, FavoriteStore, Order, Product
+from .models import BeautyStore, Category, FavoriteProduct, FavoriteStore, GlowReward, Order, Product
 from .patterns import (
     AddToCartCommand,
     CartSession,
     CheckoutFacade,
+    PaymentStrategyFactory,
+    ShippingStrategyFactory,
     ToggleFavoriteProductCommand,
     ToggleFavoriteStoreCommand,
 )
@@ -21,6 +26,46 @@ def home(request):
         'categories': categories,
         'stores': stores,
         'products': products,
+    })
+
+
+def stores_page(request):
+    stores = BeautyStore.objects.prefetch_related('products').all()
+    return render(request, 'store/stores.html', {'stores': stores})
+
+
+def categories_page(request):
+    categories = Category.objects.prefetch_related('products').all()
+    active = request.GET.get('categoria')
+    products = Product.objects.select_related('store', 'category').all()
+    if active:
+        products = products.filter(category__slug=active)
+    return render(request, 'store/categories.html', {
+        'categories': categories,
+        'products': products,
+        'active': active,
+    })
+
+
+def search(request):
+    query = request.GET.get('q', '').strip()
+    products = Product.objects.select_related('store', 'category').none()
+    stores = BeautyStore.objects.none()
+    categories = Category.objects.none()
+    if query:
+        products = Product.objects.select_related('store', 'category').filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(store__name__icontains=query) |
+            Q(category__name__icontains=query)
+        )
+        stores = BeautyStore.objects.filter(Q(name__icontains=query) | Q(description__icontains=query))
+        categories = Category.objects.filter(Q(name__icontains=query) | Q(description__icontains=query))
+    return render(request, 'store/search.html', {
+        'query': query,
+        'products': products,
+        'stores': stores,
+        'categories': categories,
     })
 
 
@@ -84,7 +129,10 @@ def remove_from_cart(request, product_id):
 
 def cart(request):
     cart_service = CartSession(request)
-    return render(request, 'store/cart.html', {'items': cart_service.items(), 'subtotal': cart_service.subtotal()})
+    return render(request, 'store/cart.html', {
+        'items': cart_service.items(),
+        'subtotal': cart_service.subtotal(),
+    })
 
 
 @login_required
@@ -101,9 +149,15 @@ def checkout(request):
         form = CheckoutForm(initial={'full_name': request.user.get_full_name() or request.user.username})
     preview = facade.preview(
         request.POST.get('payment_method', 'credit'),
-        request.POST.get('shipping_method', 'standard')
+        request.POST.get('shipping_method', 'standard'),
+        request.POST.get('reward_code', ''),
     )
-    return render(request, 'store/checkout.html', {'form': form, 'preview': preview, 'items': facade.cart.items()})
+    return render(request, 'store/checkout.html', {
+        'form': form,
+        'preview': preview,
+        'items': facade.cart.items(),
+        'checkout_config': facade.frontend_config(),
+    })
 
 
 @login_required
@@ -115,7 +169,27 @@ def order_detail(request, order_id):
 @login_required
 def profile(request):
     orders = request.user.orders.order_by('-created_at')
-    return render(request, 'store/profile.html', {'orders': orders})
+    account = GlowClubService.account_for(request.user)
+    rewards = GlowReward.objects.filter(is_active=True).select_related('product')
+    redemptions = request.user.glowclub_redemptions.select_related('reward')[:8]
+    return render(request, 'store/profile.html', {
+        'orders': orders,
+        'account': account,
+        'rewards': rewards,
+        'redemptions': redemptions,
+    })
+
+
+@login_required
+@require_POST
+def redeem_reward(request, reward_id):
+    reward = get_object_or_404(GlowReward, id=reward_id, is_active=True)
+    try:
+        redemption = GlowClubService.redeem(request.user, reward)
+        messages.success(request, f'Resgate criado: {redemption.code}')
+    except ValueError as error:
+        messages.error(request, str(error))
+    return redirect('profile')
 
 
 def register(request):
@@ -123,6 +197,7 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+            GlowClubService.account_for(user)
             login(request, user)
             return redirect('home')
     else:

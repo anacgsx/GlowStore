@@ -1,29 +1,18 @@
 {% extends 'store/base.html' %}
 {% block title %}Pedido #{{ order.id }} | GlowStore{% endblock %}
 {% block content %}
-<section class="page-title"><h1>Pedido #{{ order.id }}</h1></section>
+<section class="page-title"><span>compra confirmada</span><h1>Pedido #{{ order.id }}</h1></section>
 <div class="order-card">
   <h2>Status: {{ order.get_status_display }}</h2>
   <p><strong>Entrega:</strong> {{ order.address }}</p>
   <p><strong>Pagamento:</strong> {{ order.payment_method }}</p>
+  {% if order.reward_code %}<p><strong>Cupom GlowClub:</strong> {{ order.reward_code }}</p>{% endif %}
+  <p><strong>Pontos ganhos:</strong> {{ order.glow_points_earned }} pontos</p>
   <div class="cart-list">
     {% for item in order.items.all %}
-      <div class="cart-item">
-        <div class="cart-art">
-          {% if item.product.image %}
-           <img src="{{ item.product.image.url }}">
-          {% else %}
-           <img src="/static/images/default-product.png">
-          {% endif %}
-        </div>
-        <div>
-          <h3>{{ item.product.name }}</h3>
-          <p>{{ item.quantity }}x R$ {{ item.unit_price }}</p>
-        </div>
-        <strong>R$ {{ item.total }}</strong>
-      </div>
+      <div class="cart-item"><div class="cart-art">{% if item.product.image %}<img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">{% else %}<img src="/static/images/default-product.png" alt="{{ item.product.name }}">{% endif %}</div><div><h3>{{ item.product.name }}</h3><p>{{ item.quantity }}x R$ {{ item.unit_price }}</p></div><strong>R$ {{ item.total }}</strong></div>
     {% endfor %}
   </div>
-  <h2>Total: R$ {{ order.total }}</h2>
+  <div class="totals-box"><p>Subtotal <strong>R$ {{ order.subtotal }}</strong></p><p>Entrega <strong>R$ {{ order.shipping_total }}</strong></p><p>Desconto <strong>- R$ {{ order.discount_total }}</strong></p><h2>Total: R$ {{ order.total }}</h2></div>
 </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends 'store/base.html' %}
 {% block title %}Login | GlowStore{% endblock %}
 {% block content %}
-<section class="auth-card"><h1>Entrar</h1><form method="post" class="panel-form">{% csrf_token %}{{ form.as_p }}<button class="btn full">login</button></form><p>Ainda não tem conta? <a href="{% url 'register' %}">Cadastre-se</a></p></section>
+<section class="auth-card"><span>bem-vinda de volta</span><h1>Entrar</h1><form method="post" class="panel-form">{% csrf_token %}{{ form.as_p }}<button class="btn full">login</button></form><p>Ainda não tem conta? <a href="{% url 'register' %}">Cadastre-se</a></p></section>
 {% endblock %}

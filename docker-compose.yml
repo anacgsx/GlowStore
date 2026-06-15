@@ -1,0 +1,14 @@
+services:
+  web:
+    build: .
+    container_name: glowstore_web
+    command: sh -c "python manage.py migrate && python manage.py seed_glowstore && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "True"
+      SECRET_KEY: "dev-secret-key-glowstore"
+      ALLOWED_HOSTS: "127.0.0.1,localhost"
+      SERVE_MEDIA: "True"
+    volumes:
+      - .:/app
