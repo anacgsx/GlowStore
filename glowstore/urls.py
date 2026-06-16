@@ -8,7 +8,5 @@ urlpatterns = [
     path('', include('store.urls')),
 ]
 
-# Em produção acadêmica no Render, os arquivos de mídia de exemplo ficam no próprio projeto.
-# Para um e-commerce real, o ideal seria Cloudinary/S3/Supabase Storage.
 if settings.DEBUG or getattr(settings, 'SERVE_MEDIA', False):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
