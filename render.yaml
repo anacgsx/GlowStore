@@ -30,4 +30,7 @@ services:
         value: "https://*.onrender.com"
 
       - key: SERVE_MEDIA
+        value: "False"
+
+      - key: MEDIA_AS_STATIC
         value: "True"

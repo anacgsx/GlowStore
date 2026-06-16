@@ -8,5 +8,5 @@ urlpatterns = [
     path('', include('store.urls')),
 ]
 
-if settings.DEBUG or getattr(settings, 'SERVE_MEDIA', False):
+if (settings.DEBUG or getattr(settings, 'SERVE_MEDIA', False)) and settings.MEDIA_URL != settings.STATIC_URL:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

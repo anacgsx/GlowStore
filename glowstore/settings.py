@@ -75,7 +75,8 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-MEDIA_URL = '/media/'
+MEDIA_AS_STATIC = os.environ.get('MEDIA_AS_STATIC', 'False').lower() == 'true'
+MEDIA_URL = STATIC_URL if MEDIA_AS_STATIC else '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 SERVE_MEDIA = os.environ.get('SERVE_MEDIA', 'True').lower() == 'true'
 
